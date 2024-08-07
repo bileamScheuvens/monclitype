@@ -50,16 +50,17 @@ function play_line(terminal, lines, scorer)
         
         # advance dirty
         key == Int(ENTER_KEY) && break
+        backspace(line) = length(line) > 0 ? written_line[1:end-1] : written_line
 
         # backpace
-        if key == Int(BACKSPACE) || (key == Int(CTRL_BACKSPACE) && written_line[end] == ' ')
+        if key == Int(BACKSPACE) || (key == Int(CTRL_BACKSPACE) && written_line != "" && written_line[end] == ' ')
             register_press!(scorer)
-            written_line = written_line[1:end-1]
-        # ctrl + backspace
+            written_line = backspace(written_line)
+            # ctrl + backspace
         elseif key == Int(CTRL_BACKSPACE)
             register_press!(scorer)
             while length(written_line) > 0 && written_line[end] != ' '
-                written_line = written_line[1:end-1]
+                written_line = backspace(written_line)
             end
         else
             written_line *= Char(key)
