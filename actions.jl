@@ -1,15 +1,21 @@
 module actions
-export play, change_settings, debug
+export play, change_settings!, debug
 
 import Term: tprint
+import TerminalMenus: RadioMenu, request
 
 include("utils.jl")
 
 using ..scoring: Scorer, register_press!
 using ..settings
 
-function change_settings()
-    println("not implemented")
+function change_settings!(settings::Settings)
+    setting_choice = request("Choose Setting to edit: ", RadioMenu(collect(exposed_settings)))
+    setting_being_changed = exposed_settings[setting_choice]
+    value_choice = request("Select value for $setting_choice", RadioMenu(string.(exposed_options[setting_being_changed])))
+    resulting_value = exposed_options[setting_being_changed][value_choice]
+    exposed_setters[setting_being_changed](settings, resulting_value)
+    println("setting $setting_being_changed to $resulting_value")
 end
 
 function debug(terminal)
