@@ -1,6 +1,6 @@
 module scoring
 export Scorer
-export get_cpm, get_elapsed, get_accuracy
+export get_cpm, get_elapsed, get_accuracy, reset!
 export register_press!
 
 using Dates
