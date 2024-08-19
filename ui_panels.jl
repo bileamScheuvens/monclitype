@@ -17,8 +17,6 @@ Press $(colorize("Enter", "key")) to begin, $(colorize("Esc", "key")) to quit $(
 end
 
 function score_panel(scorer::Scorer)
-    print("\n")
-    length(scorer.keypresses) == 0 && return ""
     return tprint(Panels.Panel(
         "Typing test complete after $(get_elapsed(scorer)) seconds. 
 WPM: $(round(get_cpm(scorer)/5, digits=2))

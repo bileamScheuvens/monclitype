@@ -1,6 +1,6 @@
 module scoring
 export Scorer
-export get_cpm, get_elapsed, get_accuracy, reset!
+export get_cpm, get_elapsed, get_accuracy, reset!, is_empty
 export register_press!
 
 using Dates
@@ -13,6 +13,8 @@ mutable struct Scorer
         new(keypresses, errors)
     end
 end
+
+is_empty(scorer::Scorer) = length(scorer.keypresses) == 0
 
 get_elapsed(scorer::Scorer) = round(scorer.keypresses[end] - scorer.keypresses[1]; digits=2)
 

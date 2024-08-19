@@ -10,7 +10,7 @@ include("utils.jl")
 include("settings.jl")
 using .settings
 include("scoring.jl")
-using .scoring: Scorer, reset!
+using .scoring: Scorer, reset!, is_empty
 include("ui_panels.jl")
 using .ui_panels
 include("actions.jl")
@@ -35,11 +35,13 @@ function main()
         if key == Int(ENTER_KEY)
             wordlist = load_wordlist(; wordconstraints=settings.wordconstraints)
             play(terminal, wordlist, scorer, settings)
+            wipelines(3)
+            is_empty(scorer) && continue
             score_panel(scorer)
             reset!(scorer)
             println("Press any key to continue...")
             key = readKey(terminal.in_stream)
-            wipelines(11)
+            wipelines(7)
             key in INTERRUPT_KEYS && break
         elseif Char(key) == 's'
             change_settings!(settings)
@@ -51,6 +53,7 @@ function main()
     end
 
     goodbye_panel()
+    print(repeat("\n",5))
     disableRawMode(terminal)
 end
 
