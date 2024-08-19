@@ -22,20 +22,12 @@ using Term: tprint
 COLORS = Dict(
     "latent" => "#959392",
     "right" => "#FFFFFF",
-    "wrong" => "#AA1E00",
+    "wrong" => "#959392 on_#760000",
     "key" => "#91A5FF",
 )
 
 ANSI_UP(code=1) = "\033[$(code)A"
 ANSI_CLEAR(code=0) = "\x1b[$(code)K"
-
-# begin
-#     println("---")
-#     println("a")
-#     print(ANSI_UP(2))
-#     println("b")
-#     println("---")
-# end
 
 INTERRUPT_KEYS = Int.([CTRL_C, CTRL_D, ESC_KEY])
 
@@ -182,8 +174,15 @@ function render_lines(lines, written_line)
     end
 end
 
+function wipelines(n)
+    print(ANSI_UP(n))
+    for _ in 1:n
+        print(ANSI_CLEAR(2), "\n")
+    end
+    print(ANSI_UP(n))
+end
 
-function load_wordlist(; filename="words_alpha.txt", wordconstraints::Function=x->true)
+function load_wordlist(; filename=joinpath(@__DIR__, "words_alpha.txt"), wordconstraints::Function=x->true)
     wordlist = open(filename, "r") do f
         readlines(f)
     end

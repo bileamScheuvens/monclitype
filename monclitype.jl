@@ -10,7 +10,7 @@ include("utils.jl")
 include("settings.jl")
 using .settings
 include("scoring.jl")
-using .scoring: Scorer
+using .scoring: Scorer, reset!
 include("ui_panels.jl")
 using .ui_panels
 include("actions.jl")
@@ -24,26 +24,29 @@ function main()
     
     settings = Settings()
 
-    welcome_panel()
     enableRawMode(terminal)
-    
     scorer = Scorer()
     # core loop
     while true
+        welcome_panel()
         key = readKey(terminal.in_stream)
+        wipelines(5)
         key in INTERRUPT_KEYS && break
         if key == Int(ENTER_KEY)
             wordlist = load_wordlist(; wordconstraints=settings.wordconstraints)
             play(terminal, wordlist, scorer, settings)
             score_panel(scorer)
             reset!(scorer)
+            println("Press any key to continue...")
+            key = readKey(terminal.in_stream)
+            wipelines(11)
+            key in INTERRUPT_KEYS && break
         elseif Char(key) == 's'
             change_settings!(settings)
             enableRawMode(terminal)
         elseif Char(key) == 'd'
             debug(terminal)
-        else
-            println("invalid action")
+            wipelines(1)
         end
     end
 

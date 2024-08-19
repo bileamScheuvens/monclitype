@@ -10,18 +10,36 @@ using ..scoring: Scorer, register_press!
 using ..settings
 
 function change_settings!(settings::Settings)
-    setting_choice = request("Choose Setting to edit: ", RadioMenu(collect(exposed_settings)))
+    # choose setting
+    setting_choice = try
+        request("Choose Setting to edit: ", RadioMenu(collect(exposed_settings)))
+    catch e
+        wipelines(1+length(exposed_settings))
+        return
+    end
+    wipelines(1+length(exposed_settings))
     setting_being_changed = exposed_settings[setting_choice]
-    value_choice = request("Select value for $setting_choice", RadioMenu(string.(exposed_options[setting_being_changed])))
+
+    # choose value for setting
+    value_choice = try
+        request("Select value for $setting_being_changed", RadioMenu(string.(exposed_options[setting_being_changed])))
+    catch e
+        wipelines(1+length(exposed_options[setting_being_changed]))
+        return
+    end
+    wipelines(1+length(exposed_options[setting_being_changed]))
+    
+    # apply change
     resulting_value = exposed_options[setting_being_changed][value_choice]
     exposed_setters[setting_being_changed](settings, resulting_value)
-    println("setting $setting_being_changed to $resulting_value")
 end
 
 function debug(terminal)
+    print("\n")
     while true
         key = readKey(terminal.in_stream)
-        println("\rpressed $key")
+        wipelines(1)
+        println("pressed $key")
         key in INTERRUPT_KEYS && return
     end
 end
