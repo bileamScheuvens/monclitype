@@ -53,17 +53,14 @@ function get_line(wordlist; len=4)
 end
 
 
-function play_line(terminal, lines, scorer)
-    # play single line, return status, elapsed, n_chars, n_words
+function play_line(terminal, target, scorer)
+    # play single line, return statuscode and written line
     written_line = ""
-    target = lines[2]
-    # while length(written_line) ≤ length(target)
     while true
-        # tprint("\r"*stylize_line(written_line, target)*ANSI_CLEAR())
-        render_lines(lines, written_line)
+        rewrite_line(stylize_line(written_line, target))
         key = readKey(terminal.in_stream)
         # interrups: ctrl+c/d, esc
-        key in INTERRUPT_KEYS && return -1
+        key in INTERRUPT_KEYS && return -1, written_line
 
         if key in  [Int(ENTER_KEY), Int(' ')]
             # skip enter or space as first press
@@ -92,25 +89,32 @@ function play_line(terminal, lines, scorer)
             register_press!(scorer; typo=Char(key)!=target[pos_in_target])
         end
     end
-    render_lines(lines, written_line)
-
-    lines[2] = stylize_line(written_line, target)
-    return 1
+    rewrite_line(stylize_line(written_line, target))
+    return 1, written_line
 end
 
 
 
 function play(terminal, wordlist, scorer, settings)
-    lines = [""]
-    for _ in 1:2
-        push!(lines, get_line(wordlist, len=settings.words_per_line))
-    end
-    print("\n\n\n")
+    target = get_line(wordlist, len=settings.words_per_line)
+    preview = get_line(wordlist, len=settings.words_per_line)
+    print("\n\n")
+    rewrite_line(colorize(preview, "latent"))
+    # move to active line
+    print(ANSI_UP(1))
     while true
-        returncode = play_line(terminal, lines, scorer)
-        popfirst!(lines)
-        push!(lines, get_line(wordlist))
+        returncode, written_line = play_line(terminal, target, scorer)
+        # display history 
+        print(ANSI_UP(1))
+        rewrite_line(stylize_line(written_line, target)*"\n")
+        target = preview
+        # display new target
+        rewrite_line(colorize(target, "latent")*"\n")
+        preview = get_line(wordlist, len=settings.words_per_line)
+        # display new preview
+        rewrite_line(colorize(preview, "latent"))
         returncode < 0 && return
+        print(ANSI_UP(1))
     end
 end
 

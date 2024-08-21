@@ -161,17 +161,10 @@ function stylize_line(line, target)
     return out
 end
 
-function render_lines(lines, written_line)
-    print(ANSI_UP(3))
-    content = [
-        lines[1],
-        stylize_line(written_line, lines[2]),
-        colorize(lines[3], "latent")
-    ]
-    for c in content
-        print(ANSI_CLEAR(2))
-        tprint(c*"\n")
-    end
+function rewrite_line(content)
+    print("\r")
+    print(ANSI_CLEAR(2))
+    tprint(content)
 end
 
 function wipelines(n)

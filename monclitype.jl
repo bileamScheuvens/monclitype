@@ -35,7 +35,7 @@ function main()
         if key == Int(ENTER_KEY)
             wordlist = load_wordlist(; wordconstraints=settings.wordconstraints)
             play(terminal, wordlist, scorer, settings)
-            wipelines(3)
+            wipelines(2)
             is_empty(scorer) && continue
             score_panel(scorer)
             reset!(scorer)
@@ -53,7 +53,6 @@ function main()
     end
 
     goodbye_panel()
-    print(repeat("\n",5))
     disableRawMode(terminal)
 end
 
